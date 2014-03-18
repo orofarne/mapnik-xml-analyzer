@@ -129,6 +129,8 @@ doc.xpath('/Map/Layer').each { |layer|
 	query = to_text(datasource.xpath('./Parameter[@name="table"]').first)
 	query = "SELECT * FROM #{query}"
 
+	filters.uniq! { |f| f.to_json }
+
 	layer_data = {
 		:name => layer['name'],
 		:query => query,
@@ -141,7 +143,7 @@ doc.xpath('/Map/Layer').each { |layer|
 		conn = PGconn.open(qopts)
 		res = conn.exec(query)
 		res.each do |row|
-			if filter_row(filters, row) then
+			if !filter_row(filters, row) then
 				row['way'] = '...' if !row['way'].nil?
 				unnecessary_rows << row
 			end
