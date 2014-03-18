@@ -140,7 +140,10 @@ doc.xpath('/Map/Layer').each { |layer|
 		conn = PGconn.open(qopts)
 		res = conn.exec(query)
 		res.each do |row|
-			unnecessary_rows << row if filter_row(filters, row)
+			if filter_row(filters, row) then
+				row['way'] = '...' if !row['way'].nil?
+				unnecessary_rows << row
+			end
 		end
 	rescue Exception => e
 		$stderr.puts "[ERROR]: Postgresql #{e}"
