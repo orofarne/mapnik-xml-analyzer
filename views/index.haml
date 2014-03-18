@@ -1,0 +1,34 @@
+- data.each do |layer|
+  %h2 #{layer['name']}
+  .accordion{:id => "#{layer['name']}-accordion"}
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-SQL"}
+          .row-fluid
+            .span10
+              SQL
+            .span2.text-right
+              - if layer['time'] > 1.0 then
+                %span.label.label-important #{layer['time']} s
+              - else
+                %span.label.label-success #{layer['time']} s
+      .accordion-body.collapse{:id => "#{layer['name']}-SQL"}
+        .accordion-inner
+          %pre #{layer['query']}
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-urows", :onClick => "loadURows('#{layer['name']}');"}
+          .row-fluid
+            .span10
+              Unnecessary rows
+            .span2.text-right
+              - if layer['unnecessary_rows'].size == 0 then
+                %span.label.label-success #{layer['unnecessary_rows'].size}
+              - elsif layer['unnecessary_rows'].size > 1000 then
+                %span.label.label-important #{layer['unnecessary_rows'].size}
+              - else
+                %span.label.label-warning #{layer['unnecessary_rows'].size}
+      .accordion-body.collapse{:id => "#{layer['name']}-urows"}
+        .accordion-inner
+          %pre{:id => "#{layer['name']}-urows-data"}
+            loading...

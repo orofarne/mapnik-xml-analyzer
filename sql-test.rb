@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'optparse'
 require 'nokogiri'
 require 'json'
 require 'pygments.rb'
@@ -7,7 +8,27 @@ require 'pg'
 
 require_relative 'parser.rb'
 
-f = File.open(ARGV[0])
+$options = {}
+opt_parser = OptionParser.new do |opts|
+	opts.banner = "Usage: sql-test.rb [options]"
+
+	opts.on("-i", "--input FILE", "Mapnik XML style file") do |v|
+		$options[:input] = v
+	end
+
+	opts.on("--[no-]color", "Colorize json output") do |v|
+		$options[:color] = v
+	end
+end
+
+opt_parser.parse!
+
+if $options[:input].nil? then
+	$stderr.puts opt_parser.help
+	exit 1
+end
+
+f = File.open($options[:input])
 doc = Nokogiri::XML(f)
 f.close
 
@@ -21,11 +42,15 @@ end
 
 def print_json(obj)
 	json = JSON.pretty_generate(obj)
-	puts Pygments.highlight(json,
+	if $options[:color] then
+		puts Pygments.highlight(json,
 							:formatter => 'terminal',
 							:lexer => 'javascript',
 							:options => {:encoding => 'utf-8'}
 						)
+	else
+		puts json
+	end
 end
 
 def apply_filter(filter, row)
@@ -72,6 +97,9 @@ def filter_row(filters, row)
 	false
 end
 
+
+data = []
+
 doc.xpath('/Map/Layer').each { |layer|
 	filters = []
 	layer.xpath('./StyleName').each { |style|
@@ -80,7 +108,7 @@ doc.xpath('/Map/Layer').each { |layer|
 				tree = Parser.parse(filter.child.to_s)
 				filters << tree.to_hash
 			rescue Exception
-				puts "ERROR on #{filter.child}"
+				$stderr.puts "ERROR on #{filter.child}"
 			end
 		}
 	}
@@ -101,15 +129,13 @@ doc.xpath('/Map/Layer').each { |layer|
 	query = to_text(datasource.xpath('./Parameter[@name="table"]').first)
 	query = "SELECT * FROM #{query}"
 
-	puts
-	puts '=================='
-	puts layer['name']
-	puts '=================='
-	puts
-
-	puts query
+	layer_data = {
+		:name => layer['name'],
+		:query => query
+	}
 
 	unnecessary_rows = []
+	ts_before = Time.now
 	begin
 		conn = PGconn.open(qopts)
 		res = conn.exec(query)
@@ -117,11 +143,14 @@ doc.xpath('/Map/Layer').each { |layer|
 			unnecessary_rows << row if filter_row(filters, row)
 		end
 	rescue Exception => e
-		puts "[ERROR]: Postgresql #{e}"
+		$stderr.puts "[ERROR]: Postgresql #{e}"
 	end
+	ts_after = Time.now
 
-	puts "Unnecessary rows:"
-	puts
-	print_json unnecessary_rows
-	puts
+	layer_data[:unnecessary_rows] = unnecessary_rows
+	layer_data[:time] = ts_after - ts_before
+
+	data << layer_data
 }
+
+print_json data
