@@ -9,6 +9,7 @@
         padding-top: 60px;            |
       }                               |
     %link{:href => '/css/bootstrap-responsive.min.css', :rel => 'stylesheet'}
+    %link{:href => '/css/github.css', :rel => 'stylesheet'}
   %body
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
@@ -19,3 +20,5 @@
     %script{:src => '/js/jquery-2.1.0.min.js'}
     %script{:src => '/js/bootstrap.min.js'}
     %script{:src => '/js/mapnik-xml-test.js'}
+    %script{:src => '/js/highlight.pack.js'}
+    %script hljs.initHighlightingOnLoad();
