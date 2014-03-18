@@ -1,0 +1,37 @@
+grammar Filter
+	rule expr
+		filter expr_right? <Expr>
+	end
+
+	rule expr_right
+		space? lop space? filter expr_right? <ExprRight>
+	end
+
+	rule lop
+		'and' <Lop> / 'or' <Lop>
+	end
+
+	rule filter
+		'(' '[' field ']' space cond space value_ext ')' <Filt>
+	end
+
+	rule cond
+		'!=' <Cond> / '=' <Cond> / '&lt;=' <Cond> / '&gt;=' <Cond> / '&gt;' <Cond> / '&lt;' <Cond>
+	end
+
+	rule field
+		[a-zA-Z_] [a-zA-Z_\-0-9]* <Field>
+	end
+
+	rule value_ext
+		"'"? value "'"? <ValueExt>
+	end
+
+	rule value
+		[^')]* <Value>
+	end
+
+	rule space
+		[\s]+
+	end
+end
