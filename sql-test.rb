@@ -92,6 +92,7 @@ end
 
 def filter_row(filters, row)
 	filters.each { |filter|
+		return true if filter[:all]
 		return true if apply_expression(filter, row)
 	}
 	false
@@ -103,13 +104,18 @@ data = []
 doc.xpath('/Map/Layer').each { |layer|
 	filters = []
 	layer.xpath('./StyleName').each { |style|
-		doc.xpath("/Map/Style[@name=\"#{style.child}\"]/Rule/Filter").each { |filter|
-			begin
-				tree = Parser.parse(filter.child.to_s)
-				filters << tree.to_hash
-			rescue Exception
-				$stderr.puts "ERROR on #{filter.child}"
-			end
+		doc.xpath("/Map/Style[@name=\"#{style.child}\"]/Rule").each { |rule|
+			all_data = true
+			rule.xpath("./Filter").each { |filter|
+				begin
+					tree = Parser.parse(filter.child.to_s)
+					filters << tree.to_hash
+					all_data = false
+				rescue Exception
+					$stderr.puts "ERROR on #{filter.child}"
+				end
+			}
+			filters << {:all => true} if all_data
 		}
 	}
 
