@@ -131,7 +131,8 @@ doc.xpath('/Map/Layer').each { |layer|
 
 	layer_data = {
 		:name => layer['name'],
-		:query => query
+		:query => query,
+		:filters => filters
 	}
 
 	unnecessary_rows = []

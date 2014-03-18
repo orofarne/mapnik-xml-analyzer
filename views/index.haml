@@ -3,6 +3,23 @@
   .accordion{:id => "#{layer['name']}-accordion"}
     .accordion-group
       .accordion-heading
+        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-filters"}
+          .row-fluid
+            .span10
+              Filters
+            .span2.text-right
+              %span.label #{layer['filters'].size}
+      .accordion-body.collapse{:id => "#{layer['name']}-filters"}
+        .accordion-inner
+          %table.table
+            - layer['filters'].each do |filter|
+              %tr
+                %td
+                  %pre
+                    %code
+                      #{filter.to_json}
+    .accordion-group
+      .accordion-heading
         %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-SQL"}
           .row-fluid
             .span10
@@ -32,5 +49,6 @@
                 %span.label.label-warning #{layer['unnecessary_rows'].size}
       .accordion-body.collapse{:id => "#{layer['name']}-urows"}
         .accordion-inner
-          %pre{:id => "#{layer['name']}-urows-data"}
-            loading...
+          %pre
+            %code{:id => "#{layer['name']}-urows-data"}
+              loading...
