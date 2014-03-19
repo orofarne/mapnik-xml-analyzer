@@ -1,5 +1,7 @@
 - data.each do |layer|
-  %h2 #{layer['name']}
+  %h2
+    %a{:href => "/details/#{layer['name']}"}
+      #{layer['name']}
   .accordion{:id => "#{layer['name']}-accordion"}
     .accordion-group
       .accordion-heading

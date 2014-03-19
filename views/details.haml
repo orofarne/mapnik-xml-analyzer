@@ -1,0 +1,24 @@
+%h1=layer['name']
+.row-fluid
+  .span6
+    %table.table
+      - layer['filters'].each do |filter|
+        %tr
+          %td
+            %pre
+              %code
+                #{filter.to_json}
+  .span6
+    %pre
+      %code
+        #{layer['query']}
+%h2 Unnecessary rows
+.row
+  .span12
+    %table.table
+      - layer['unnecessary_rows'].each do |row|
+        %tr
+          %td
+            %pre
+              %code
+                #{row.to_json}

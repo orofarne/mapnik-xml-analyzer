@@ -25,3 +25,8 @@ get '/urows/:layer' do |layer|
 		$data.select { |l| l['name'] == layer }.first['unnecessary_rows']
 	)
 end
+
+get '/details/:layer' do |layer|
+	data = $data.select { |l| l['name'] == layer }.first
+	haml :details, :locals => {:title => $fin, :layer => data}
+end
