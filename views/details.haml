@@ -9,9 +9,21 @@
               %code
                 #{filter.to_json}
   .span6
-    %pre
-      %code
-        #{layer['query']}
+    %table.table
+      %tr
+        %td
+          %pre
+            %code
+              #{layer['query']}
+          .text-right
+            %a.btn{:href => "/editsql/#{layer['name']}"}
+              %i.icon-edit
+              edit
+      %tr
+        %td
+          %pre
+            %code
+              #{layer['query_explain']}
 %h2 Unnecessary rows
 .row
   .span12

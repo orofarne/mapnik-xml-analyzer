@@ -140,26 +140,37 @@ doc.xpath('/Map/Layer').each { |layer|
 	layer_data = {
 		:name => layer['name'],
 		:query => query,
+		:query_opts => qopts,
 		:filters => filters
 	}
 
+	necessary_rows = []
 	unnecessary_rows = []
+	explain = ""
 	ts_before = Time.now
 	begin
 		conn = PGconn.open(qopts)
 		res = conn.exec(query)
 		res.each do |row|
-			if !filter_row(filters, row) then
-				row['way'] = '...' if !row['way'].nil?
+			row['way'] = '...' if !row['way'].nil?
+			if filter_row(filters, row) then
+				necessary_rows << row
+			else
 				unnecessary_rows << row
 			end
+		end
+		explain_res = conn.exec("EXPLAIN ANALYZE #{query}")
+		explain_res.each do |row|
+			explain << "#{row['QUERY PLAN']}\n"
 		end
 	rescue Exception => e
 		$stderr.puts "[ERROR]: Postgresql #{e}"
 	end
 	ts_after = Time.now
 
+	layer_data[:necessary_rows] = necessary_rows
 	layer_data[:unnecessary_rows] = unnecessary_rows
+	layer_data[:query_explain] = explain
 	layer_data[:time] = ts_after - ts_before
 
 	data << layer_data

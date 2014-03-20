@@ -1,0 +1,12 @@
+#toolbar.btn-toolbar
+  .btn-group
+    %a.btn.btn-small{:onclick => "checkSQL('#{layer['name']}');"}
+      %i.icon-play
+      Run
+    %a.btn.btn-small{:onclick => "doneSQL('#{layer['name']}');"}
+      %i.icon-ok
+      Done
+  #sqlmsg
+#editor loading...
+%script{:src => '/js/ace.js', :type => 'text/javascript', :charset => 'utf-8'}
+%script{:type => 'text/javascript'} initEditor("#{layer['name']}");

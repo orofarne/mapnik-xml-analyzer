@@ -1,0 +1,17 @@
+body {
+	padding-top: 50px;
+}
+
+#toolbar {
+	position: absolute;
+	top: 40px;
+	left: 30px;
+}
+
+#editor {
+	position: absolute;
+	top: 85px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
