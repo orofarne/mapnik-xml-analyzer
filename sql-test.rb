@@ -16,6 +16,10 @@ opt_parser = OptionParser.new do |opts|
 		$options[:input] = v
 	end
 
+	opts.on("-p", "--[no-]progress", "Output progress information to stderr") do |v|
+		$options[:progress] = v
+	end
+
 	opts.on("--[no-]color", "Colorize json output") do |v|
 		$options[:color] = v
 	end
@@ -101,7 +105,12 @@ end
 
 data = []
 
-doc.xpath('/Map/Layer').each { |layer|
+xml_layers = doc.xpath('/Map/Layer');
+xml_layers_i = 0.0
+xml_layers_count = xml_layers.size
+$stderr.puts "#{xml_layers_count} layers found" if $options[:progress]
+
+xml_layers.each { |layer|
 	filters = []
 	layer.xpath('./StyleName').each { |style|
 		doc.xpath("/Map/Style[@name=\"#{style.child}\"]/Rule").each { |rule|
@@ -174,6 +183,9 @@ doc.xpath('/Map/Layer').each { |layer|
 	layer_data[:time] = ts_after - ts_before
 
 	data << layer_data
+
+	xml_layers_i += 1
+	$stderr.puts "  #{xml_layers_i / xml_layers_count * 100}% done" if $options[:progress]
 }
 
 print_json data
