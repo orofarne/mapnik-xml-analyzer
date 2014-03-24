@@ -23,6 +23,22 @@ opt_parser = OptionParser.new do |opts|
 	opts.on("--[no-]color", "Colorize json output") do |v|
 		$options[:color] = v
 	end
+
+	opts.on("--host HOST", "Override host option") do |v|
+		$options[:host] = v
+	end
+
+	opts.on("--user USER", "Override user option") do |v|
+		$options[:user] = v
+	end
+
+	opts.on("--password PASS", "Override password option") do |v|
+		$options[:password] = v
+	end
+
+	opts.on("--dbname DBNAME", "Override dbname option") do |v|
+		$options[:dbname] = v
+	end
 end
 
 opt_parser.parse!
@@ -111,6 +127,8 @@ xml_layers_count = xml_layers.size
 $stderr.puts "#{xml_layers_count} layers found" if $options[:progress]
 
 xml_layers.each { |layer|
+	xml_layers_i += 1
+
 	filters = []
 	layer.xpath('./StyleName').each { |style|
 		doc.xpath("/Map/Style[@name=\"#{style.child}\"]/Rule").each { |rule|
@@ -136,10 +154,10 @@ xml_layers.each { |layer|
 	next if qtype != 'postgis'
 
 	qopts = {
-		:host => to_text(datasource.xpath('./Parameter[@name="host"]').first),
-		:user => to_text(datasource.xpath('./Parameter[@name="user"]').first),
-		:password => to_text(datasource.xpath('./Parameter[@name="password"]').first),
-		:dbname => to_text(datasource.xpath('./Parameter[@name="dbname"]').first)
+		:host => $options[:host] || to_text(datasource.xpath('./Parameter[@name="host"]').first),
+		:user => $options[:user] || to_text(datasource.xpath('./Parameter[@name="user"]').first),
+		:password => $options[:password] || to_text(datasource.xpath('./Parameter[@name="password"]').first),
+		:dbname => $options[:dbname] || to_text(datasource.xpath('./Parameter[@name="dbname"]').first)
 	}
 	query = to_text(datasource.xpath('./Parameter[@name="table"]').first)
 	query = "SELECT * FROM #{query}"
@@ -184,7 +202,6 @@ xml_layers.each { |layer|
 
 	data << layer_data
 
-	xml_layers_i += 1
 	$stderr.puts "  #{xml_layers_i / xml_layers_count * 100}% done" if $options[:progress]
 }
 
