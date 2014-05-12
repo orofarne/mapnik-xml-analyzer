@@ -1,8 +1,8 @@
-%h1=layer['name']
+%h1=layer[:name]
 .row-fluid
   .span6
     %table.table
-      - layer['filters'].each do |filter|
+      - layer[:filters].each do |filter|
         %tr
           %td
             %pre
@@ -14,21 +14,21 @@
         %td
           %pre
             %code
-              #{layer['query']}
+              #{layer[:query]}
           .text-right
-            %a.btn{:href => "/editsql/#{layer['name']}"}
+            %a.btn{:href => "/editsql/#{layer[:name]}"}
               %i.icon-edit
               edit
       %tr
         %td
           %pre
             %code
-              #{layer['query_explain']}
+              #{layer[:query_explain]}
 %h2 Unnecessary rows
 .row
   .span12
     %table.table
-      - layer['unnecessary_rows'].each do |row|
+      - layer[:unnecessary_rows].each do |row|
         %tr
           %td
             %pre

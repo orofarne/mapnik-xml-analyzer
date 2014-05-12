@@ -5,56 +5,49 @@ require 'sinatra'
 require 'haml'
 require 'pg'
 
-configure :production, :development do
-	$fin = ARGV[0]
-	exit 1 if $fin.nil?
-	puts "Reading data from #{$fin}..."
-	f = File.open($fin)
-	$data = JSON.load(f)
-	f.close
-	puts "done."
-end
+require_relative 'analyze.rb'
 
-set :haml, {:format => :html5, :attr_wrapper => '"'}
+class App < Sinatra::Base
 
 get '/' do
-	haml :index, :locals => {:data => $data, :title => $fin}
+	haml :index, :locals => {:data => $data, :title => $options[:title]}
 end
 
 get '/urows/:layer' do |layer|
 	JSON.pretty_generate(
-		$data.select { |l| l['name'] == layer }.first['unnecessary_rows']
+		$data.select { |l| l[:name] == layer }.first[:unnecessary_rows]
 	)
 end
 
 get '/getsql/:layer' do |layer|
-	data = $data.select { |l| l['name'] == layer }.first
-	data['query']
+	data = $data.select { |l| l[:name] == layer }.first
+	data[:query]
 end
 
 get '/details/:layer' do |layer|
-	data = $data.select { |l| l['name'] == layer }.first
-	haml :details, :locals => {:title => $fin, :layer => data}
+	data = $data.select { |l| l[:name] == layer }.first
+	haml :details, :locals => {:title => $options[:title], :layer => data}
 end
 
 get '/editsql/:layer' do |layer|
-	data = $data.select { |l| l['name'] == layer }.first
-	haml :editsql, :locals => {:title => $fin, :layer => data}
+	data = $data.select { |l| l[:name] == layer }.first
+	haml :editsql, :locals => {:title => $options[:title], :layer => data}
 end
 
 post '/checksql/:layer' do |layer|
-	data = $data.select { |l| l['name'] == layer }.first
+	data = $data.select { |l| l[:name] == layer }.first
 
 	query = request.body.read.to_s
+	query = Analyzer.sub_bbox(query, $options[:bbox])
 
 	qopts = {
-		:host => data['query_opts']['host'],
-		:user => data['query_opts']['user'],
-		:password => data['query_opts']['password'],
-		:dbname => data['query_opts']['dbname']
+		:host => data[:query_opts][:host],
+		:user => data[:query_opts][:user],
+		:password => data[:query_opts][:password],
+		:dbname => data[:query_opts][:dbname]
 	}
 
-	necessary_rows = data['necessary_rows'].clone
+	necessary_rows = data[:necessary_rows].clone
 	unnecessary_rows_count = 0
 	begin
 		conn = PGconn.open(qopts)
@@ -84,9 +77,15 @@ post '/checksql/:layer' do |layer|
 end
 
 post '/sqleditdone/:layer' do |layer|
-	data = $data.select { |l| l['name'] == layer }.first
+	data = $data.select { |l| l[:name] == layer }.first
 
 	query = request.body.read.to_s
 
-	haml :sqleditdone, :locals => {:layer => data, :new_query => query}, :layout => false
+	haml :sqleditdone, :locals => {
+		:layer => data,
+		:new_query => query,
+		:title => $options[:title]
+	}, :layout => false
+end
+
 end

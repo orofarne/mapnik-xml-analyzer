@@ -1,20 +1,20 @@
 - data.each do |layer|
   %h2
-    %a{:href => "/details/#{layer['name']}"}
-      #{layer['name']}
-  .accordion{:id => "#{layer['name']}-accordion"}
+    %a{:href => "/details/#{layer[:name]}"}
+      #{layer[:name]}
+  .accordion{:id => "#{layer[:name]}-accordion"}
     .accordion-group
       .accordion-heading
-        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-filters"}
+        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer[:name]}-accordion", :href => "##{layer[:name]}-filters"}
           .row-fluid
             .span10
               Filters
             .span2.text-right
-              %span.label #{layer['filters'].size}
-      .accordion-body.collapse{:id => "#{layer['name']}-filters"}
+              %span.label #{layer[:filters].size}
+      .accordion-body.collapse{:id => "#{layer[:name]}-filters"}
         .accordion-inner
           %table.table
-            - layer['filters'].each do |filter|
+            - layer[:filters].each do |filter|
               %tr
                 %td
                   %pre
@@ -22,35 +22,35 @@
                       #{filter.to_json}
     .accordion-group
       .accordion-heading
-        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-SQL"}
+        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer[:name]}-accordion", :href => "##{layer[:name]}-SQL"}
           .row-fluid
             .span10
               SQL
             .span2.text-right
-              - if layer['time'] > 1.0 then
-                %span.label.label-important #{layer['time']} s
+              - if layer[:time] > 1.0 then
+                %span.label.label-important #{layer[:time]} s
               - else
-                %span.label.label-success #{layer['time']} s
-      .accordion-body.collapse{:id => "#{layer['name']}-SQL"}
+                %span.label.label-success #{layer[:time]} s
+      .accordion-body.collapse{:id => "#{layer[:name]}-SQL"}
         .accordion-inner
           %pre
             %code
-              #{layer['query']}
+              #{layer[:query]}
     .accordion-group
       .accordion-heading
-        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer['name']}-accordion", :href => "##{layer['name']}-urows", :onClick => "loadURows('#{layer['name']}');"}
+        %a.accordion-toggle{:'data-toggle' => 'collapse', :'data-parent' => "##{layer[:name]}-accordion", :href => "##{layer[:name]}-urows", :onClick => "loadURows('#{layer[:name]}');"}
           .row-fluid
             .span10
               Unnecessary rows
             .span2.text-right
-              - if layer['unnecessary_rows'].size == 0 then
-                %span.label.label-success #{layer['unnecessary_rows'].size}
-              - elsif layer['unnecessary_rows'].size > 1000 then
-                %span.label.label-important #{layer['unnecessary_rows'].size}
+              - if layer[:unnecessary_rows].size == 0 then
+                %span.label.label-success #{layer[:unnecessary_rows].size}
+              - elsif layer[:unnecessary_rows].size > 1000 then
+                %span.label.label-important #{layer[:unnecessary_rows].size}
               - else
-                %span.label.label-warning #{layer['unnecessary_rows'].size}
-      .accordion-body.collapse{:id => "#{layer['name']}-urows"}
+                %span.label.label-warning #{layer[:unnecessary_rows].size}
+      .accordion-body.collapse{:id => "#{layer[:name]}-urows"}
         .accordion-inner
           %pre
-            %code{:id => "#{layer['name']}-urows-data"}
+            %code{:id => "#{layer[:name]}-urows-data"}
               loading...

@@ -1,4 +1,4 @@
-%h1 #{layer['name']}
+%h1 #{layer[:name]}
 .row-fluid
   .span6
     %h2 Old query
@@ -7,7 +7,7 @@
 .row-fluid
   .span6
     %pre
-      %code #{layer['query']}
+      %code #{layer[:query]}
   .span6
     %pre
       %code #{new_query}
