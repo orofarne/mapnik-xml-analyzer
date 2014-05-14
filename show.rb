@@ -79,7 +79,7 @@ end
 post '/sqleditdone/:layer' do |layer|
 	data = $data.select { |l| l[:name] == layer }.first
 
-	query = request.body.read.to_s
+	query = request.body.read.to_s.force_encoding("UTF-8")
 
 	haml :sqleditdone, :locals => {
 		:layer => data,
