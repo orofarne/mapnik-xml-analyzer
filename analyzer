@@ -30,7 +30,7 @@ opt_parser = OptionParser.new do |opts|
 		$options[:input] = v
 	end
 
-	opts.on("-p", "--[no-]progress", "Output progress information to stderr") do |v|
+	opts.on("--[no-]progress", "Output progress information to stderr") do |v|
 		$options[:progress] = v
 	end
 
@@ -50,9 +50,14 @@ opt_parser = OptionParser.new do |opts|
 		$options[:dbname] = v
 	end
 
-	opts.on("--bbox BBOX", "Operate in bbox, format ") do |v|
+	opts.on("--bbox BBOX", "Operate in bbox") do |v|
 		$options[:bbox] = v
 	end
+
+	opts.on("--ui-port PORT", "UI port") do |v|
+		$options[:uiport] = v
+	end
+
 end
 
 opt_parser.parse!
@@ -68,6 +73,7 @@ doc = Analyzer.parse $options
 
 App.set_data doc
 App.set_options $options
+App.set :port, $options[:uiport]
 
 App.run!
 
