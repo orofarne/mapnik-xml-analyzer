@@ -61,12 +61,19 @@ def self.filter_row(filters, row)
 	false
 end
 
+def self.proj()
+	4326
+end
+
 def self.sub_bbox(query, bbox)
-	proj = 900913 # Google projection
-	bbox_str = "ST_SetSRID('BOX3D(#{bbox})'::box3d, #{proj})"
+	bbox_str = "ST_SetSRID('BOX3D(#{bbox})'::box3d, #{self.proj})"
 	query.gsub '!bbox!', bbox_str
 end
 
+def self.add_bbox(query, geometry_field, bbox)
+	bbox_str = "ST_SetSRID('BOX3D(#{bbox})'::box3d, #{self.proj})"
+	"#{query} WHERE \"#{geometry_field}\" && #{bbox_str}"
+end
 
 def self.parse(options)
 	f = File.open(options[:input])
@@ -113,9 +120,13 @@ def self.parse(options)
 			:password => options[:password] || to_text(datasource.xpath('./Parameter[@name="password"]').first),
 			:dbname => options[:dbname] || to_text(datasource.xpath('./Parameter[@name="dbname"]').first)
 		}
+
+		geometry_field = to_text(datasource.xpath('./Parameter[@name="geometry_field"]').first)
+
 		query = to_text(datasource.xpath('./Parameter[@name="table"]').first)
 		query = "SELECT * FROM #{query}"
 		query = sub_bbox query, $options[:bbox]
+		query = add_bbox query, geometry_field, $options[:bbox]
 
 		filters.uniq! { |f| f.to_json }
 
