@@ -61,18 +61,17 @@ def self.filter_row(filters, row)
 	false
 end
 
-def self.proj()
-	4326
+def self.bbox_str(bbox)
+	proj = 4326
+	"ST_Transform(ST_SetSRID(ST_Envelope(ST_GeomFromText('LINESTRING(#{bbox})')), 4326), 900913)"
 end
 
 def self.sub_bbox(query, bbox)
-	bbox_str = "ST_SetSRID('BOX3D(#{bbox})'::box3d, #{self.proj})"
-	query.gsub '!bbox!', bbox_str
+	query.gsub '!bbox!', bbox_str(bbox)
 end
 
 def self.add_bbox(query, geometry_field, bbox)
-	bbox_str = "ST_SetSRID('BOX3D(#{bbox})'::box3d, #{self.proj})"
-	"#{query} WHERE \"#{geometry_field}\" && #{bbox_str}"
+	"#{query} WHERE \"#{geometry_field}\" && #{bbox_str(bbox)}"
 end
 
 def self.parse(options)
