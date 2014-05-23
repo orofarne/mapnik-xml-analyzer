@@ -58,6 +58,9 @@ opt_parser = OptionParser.new do |opts|
 		$options[:uiport] = v
 	end
 
+	opts.on("--ui-bind ADDR", "UI bind adress") do |v|
+		$options[:uibind] = v
+	end
 end
 
 opt_parser.parse!
@@ -73,7 +76,8 @@ doc = Analyzer.parse $options
 
 App.set_data doc
 App.set_options $options
-App.set :port, $options[:uiport]
+App.set :bind, $options[:uibind] unless $options[:uibind].nil?
+App.set :port, $options[:uiport] unless $options[:uiport].nil?
 
 App.run!
 
