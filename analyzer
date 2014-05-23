@@ -75,6 +75,8 @@ if $options[:input].nil? then
 end
 
 $options[:title] = /[^\/]+$/.match($options[:input]).to_s
+$options[:bbox].gsub! '__', ','
+$options[:bbox].gsub! '_', ' '
 
 $stderr.puts "Starting with options: #{$options}" if $options[:verbose]
 
