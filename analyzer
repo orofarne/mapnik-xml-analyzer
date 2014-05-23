@@ -30,8 +30,12 @@ opt_parser = OptionParser.new do |opts|
 		$options[:input] = v
 	end
 
-	opts.on("--[no-]progress", "Output progress information to stderr") do |v|
-		$options[:progress] = v
+	opts.on("--[no-]verbose", "Output verbose information to stderr") do |v|
+		$options[:verbose] = v
+	end
+
+	opts.on("--[no-]debug", "Output debug information to stderr") do |v|
+		$options[:debug] = v
 	end
 
 	opts.on("--host HOST", "Override host option") do |v|
@@ -71,6 +75,8 @@ if $options[:input].nil? then
 end
 
 $options[:title] = /[^\/]+$/.match($options[:input]).to_s
+
+$stderr.puts "Starting with options: #{$options}" if $options[:verbose]
 
 doc = Analyzer.parse $options
 

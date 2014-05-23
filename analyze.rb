@@ -84,7 +84,7 @@ def self.parse(options)
 	xml_layers = doc.xpath('/Map/Layer');
 	xml_layers_i = 0.0
 	xml_layers_count = xml_layers.size
-	$stderr.puts "#{xml_layers_count} layers found" if options[:progress]
+	$stderr.puts "#{xml_layers_count} layers found" if options[:verbose]
 
 	xml_layers.each { |layer|
 		xml_layers_i += 1
@@ -127,6 +127,8 @@ def self.parse(options)
 		query = sub_bbox query, $options[:bbox]
 		query = add_bbox query, geometry_field, $options[:bbox]
 
+		$stderr.puts "[SQL] #{query}" if $options[:debug]
+
 		filters.uniq! { |f| f.to_json }
 
 		layer_data = {
@@ -167,7 +169,7 @@ def self.parse(options)
 
 		data << layer_data
 
-		$stderr.puts "  #{xml_layers_i / xml_layers_count * 100}% done" if options[:progress]
+		$stderr.puts "  #{xml_layers_i / xml_layers_count * 100}% done" if options[:verbose]
 	}
 
 	data
