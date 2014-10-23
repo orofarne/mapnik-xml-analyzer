@@ -5,6 +5,7 @@ require 'nokogiri'
 require 'pg'
 
 require_relative 'parser.rb'
+require_relative 'str_tools.rb'
 
 class Analyzer
 
@@ -19,6 +20,8 @@ end
 def self.apply_filter(filter, row)
 	lval = row[filter[:field]]
 	rval = filter[:val]
+	lval = lval.to_f if lval.is_number?
+	rval = rval.to_f if rval.is_number?
 	case filter[:cond]
 	when '!='
 		return lval != rval
